@@ -1,0 +1,4 @@
+beautifulsoup4==latest
+python-dotenv==latest
+requests==latest
+selenium==latest
