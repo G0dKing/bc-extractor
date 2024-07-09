@@ -1,4 +1,4 @@
-beautifulsoup4==latest
-python-dotenv==latest
-requests==latest
-selenium==latest
+beautifulsoup4==4.12.3
+python-dotenv==1.0.1
+requests==2.32.3
+selenium==4.22.0
