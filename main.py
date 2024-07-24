@@ -1,6 +1,5 @@
 """
-This module extracts and downloads audio links from specified web pages,
-including individual tracks, albums, and playlists listed in an external file.
+Scrape .mp3 files from BandCamp!
 """
 
 import os
@@ -26,7 +25,9 @@ from selenium.common.exceptions import (
 # Load environment variables from .env file
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
-TARGETS_FILE = os.environ.get("TARGETS_FILE", "targets.txt")
+TARGETS = os.environ.get("TARGETS", "urls.txt")
+CHROME = os.environ.get("CHROME")
+DRIVER = os.environ.get("DRIVER")
 
 def setup_driver():
     """Set up and return a configured Chrome WebDriver."""
@@ -35,8 +36,8 @@ def setup_driver():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--remote-debugging-port=9222")
-    chrome_options.binary_location = "/usr/bin/google-chrome"
-    service = Service('/root/chromedriver')
+    chrome_options.binary_location = CHROME
+    service = Service(DRIVER)
     return webdriver.Chrome(service=service, options=chrome_options)
 
 def get_page_content(url):
@@ -134,12 +135,12 @@ def process_url(url):
 
 def main():
     """Main function to process all target URLs from the external file."""
-    if not os.path.exists(TARGETS_FILE):
-        print(f"Targets file '{TARGETS_FILE}' not found. "
+    if not os.path.exists(TARGETS):
+        print(f"Targets file '{TARGETS}' not found. "
               "Please create it and add your target URLs.")
         return
 
-    with open(TARGETS_FILE, 'r', encoding='utf-8') as file:
+    with open(TARGETS, 'r', encoding='utf-8') as file:
         for line in file:
             url = line.strip()
             if url:
