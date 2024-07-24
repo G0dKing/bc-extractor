@@ -14,9 +14,28 @@ _load_scraper_vars() {
 _setup_pyenv() {
     echo "Checking Dependencies..."
     source venv/bin/activate
-    pip3 install -r requirements.txt
-}
 
+    # Read requirements file and check each dependency
+    while IFS= read -r requirement || [[ -n "$requirement" ]]; do
+        # Extract package name and version
+        package=$(echo "$requirement" | cut -d'=' -f1)
+        version=$(echo "$requirement" | cut -d'=' -f3)
+
+        # Check if package is installed and its version
+        if pip freeze | grep -i "^$package==" > /dev/null; then
+            installed_version=$(pip freeze | grep -i "^$package==" | cut -d'=' -f3)
+            if [ "$installed_version" = "$version" ]; then
+                echo "$package $version is already installed."
+            else
+                echo "Updating $package from $installed_version to $version"
+                pip install -U "$requirement"
+            fi
+        else
+            echo "Installing $package $version"
+            pip install "$requirement"
+        fi
+    done < requirements.txt
+}
 _scrape_links() {
     if [[ -f $links_file ]]; then
         rm -f $links_file
